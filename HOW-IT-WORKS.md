@@ -98,6 +98,7 @@ Hover is mouse-only (a finger has no hover state to describe) and is dropped whi
 
 ## Things that look odd but are load-bearing
 
+- **The lens shader ends with `#include <colorspace_fragment>`.** The framebuffer holds linear light and the lens pass writes straight to an sRGB canvas, so the encode has to happen by hand — three only adds it to its own materials, never to a hand-written `ShaderMaterial`. Drop that line and every pixel lands about a 2.2 gamma too dark, which reads as "the images look murky" rather than as an obvious bug.
 - **`renderer.setClearColor(0xffffff)`** matches the page background so the framebuffer gaps between panels blend into the page.
 - **The canvas is `position: absolute; inset: 0`** so panel rects and the DOM overlay share one coordinate space.
 - **Pointer coordinates get the canvas origin subtracted** (`getBoundingClientRect`, cached and invalidated on scroll/resize). The carousel no longer starts at the top of the page, so client coords aren't canvas coords.

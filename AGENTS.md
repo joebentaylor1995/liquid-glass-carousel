@@ -28,6 +28,7 @@ Routing common requests: add/change images → `config.js` `PROJECTS` (each entr
 - **A drag must not follow a link.** `onPointerUp` sets `suppressClick` past `CLICK_SLOP` (`TOUCH_CLICK_SLOP` for touch) and `onClick` consumes it. Keep that handshake intact when touching either handler.
 - **The engine positions the hover overlay, React fades it.** The engine writes `transform`/`width`/`height` every frame; the component owns opacity and contents. Don't tween the transform, and keep the overlay `pointer-events: none` or it eats the hover test underneath it.
 - **Pointer coords need the canvas origin subtracted** (`bounds()`), because the canvas no longer starts at the top of the page. The cache is invalidated on scroll and resize — keep both.
+- **The lens shader must end with `#include <colorspace_fragment>`.** The FBO holds linear light and the lens pass writes straight to an sRGB canvas; three only adds the encode to its own materials, not to a hand-written `ShaderMaterial`. Without it everything renders ~2.2 gamma too dark.
 - **The FBO is sized in device pixels** (`W * dpr`), including in `onResize`. Sizing it in CSS pixels makes everything blurry on retina.
 - **Textures need mipmaps + anisotropy**, and are centre-cropped to `CONFIG.ASPECT` via `offset`/`repeat` — every panel is 16:9 and nothing may be stretched to fit.
 - **1 world unit = 1 px** (orthographic camera). All layout math assumes this.
