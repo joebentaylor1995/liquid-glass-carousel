@@ -81,9 +81,19 @@ Every knob is a uniform, mirrored 1:1 from `LENS` in `config.js`.
 `LENS.mode` picks which effect that second pass runs:
 
 - **`glass`** — the refracting lens described above.
-- **`sphere`** — the row is sampled as if it were wrapped around a cylinder with its ends rolled toward the camera. Closer means magnified, so reading a tighter vertical slice of the framebuffer toward the edges makes the outer panels grow, with a little shading as the surface turns away.
+- **`bulge`** — the middle is held dead flat and only the ends swell, using the same edge mask as the glass. Reads as a swelling rather than a curve, which is sometimes what you want.
+- **`sphere`** — you stand at the middle of the curve and the row wraps around you.
 
-Both are held off the middle of the screen by the same edge mask (see below), so the centred card stays flat whichever is running.
+The sphere wrap is worth spelling out, because two things have to happen together or it doesn't read as wrapping:
+
+- the ends sit **closer**, so they magnify — sample a tighter vertical slice toward the edges and the outer panels grow;
+- the surface **turns away** from you as it comes round, so it foreshortens — sample a *wider* horizontal slice and the panel squeezes.
+
+Magnify without foreshortening and the panels just stretch. Both together and the row reads as a surface curving past you.
+
+The active card stays flat and the curve begins at its edge. Getting that join clean is the fiddly part: masking a curve that starts at the screen's middle leaves a visible crease where the warp switches on. Instead the bend squares the distance *past* the card's edge, so it starts at zero with zero slope and leaves the flat card tangentially — straight card, curved neighbours, no kink between them.
+
+The flat section is derived from the panel width, so it tracks the card at any size; `LENS.sphereFlat` adds breathing room either side.
 
 ### Keeping the middle clean
 
