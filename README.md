@@ -10,6 +10,7 @@ Built with Next.js (App Router), but the carousel core is plain JavaScript with 
 - **Drag, not scroll** — grab and pull the row, with flick momentum and touch tuned separately from the mouse. The wheel is left alone, so the page scrolls straight past the carousel and the row stays where you left it. When input stops, it lands softly on the nearest panel center in one continuous motion.
 - **Pagination arrows** — step exactly one panel back or forward; repeated clicks queue up.
 - **Liquid-glass lens** — the row renders into a framebuffer and is drawn through a refraction shader: inward pull, chromatic dispersion, white nova core, blue shimmer ring, fluid rim wave.
+- **Two effects, one toggle** — `LENS.mode` swaps the glass lens for a sphere wrap that curves the row's ends toward the camera so the outer panels magnify. Either way the centred card stays flat.
 - **Caption under the active panel** — the centred project's title and client, swapped with a soft fade.
 - **Hover overlay** — hovering a panel fades in a 75% black scrim over it with the project's services and a headline stat.
 - **Panels are links** — a real click follows the project's `href`; a drag's trailing click never does.

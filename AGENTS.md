@@ -16,7 +16,7 @@ WebGL portfolio carousel: three.js core with a thin React/Next.js wrapper (GSAP 
 | `app/page.js` | A 100dvh section, `<CarouselSection />`, another 100dvh section. |
 | `app/work/[slug]/page.js` | Placeholder destination for the panel links. |
 
-Routing common requests: add/change images → `config.js` `PROJECTS` (each entry carries its caption, link, hover tags and stat). Panel size / gap / drag feel / snap → `config.js` `CONFIG`. Drag + click-vs-drag thresholds → `config.js` `INTERACT`. Lens look → `config.js` `LENS` (uniforms mirror it 1:1). Hover overlay look → `HOVER` + the markup in `CarouselSection.jsx`. Caption/arrow layout → `UI_ANIM` + `CarouselSection.jsx`. Motion/render behavior → `engine.js`.
+Routing common requests: add/change images → `config.js` `PROJECTS` (each entry carries its caption, link, hover tags and stat). Panel size / gap / drag feel / snap → `config.js` `CONFIG`. Drag + click-vs-drag thresholds → `config.js` `INTERACT`. Lens look → `config.js` `LENS` (`mode` picks the `glass` lens or the `sphere` wrap; uniforms mirror it 1:1). Hover overlay look → `HOVER` + the markup in `CarouselSection.jsx`. Caption/arrow layout → `UI_ANIM` + `CarouselSection.jsx`. Motion/render behavior → `engine.js`.
 
 ## Architecture invariants — do not break these
 

@@ -78,6 +78,19 @@ Inside the shader, a disc (or rounded rect) region gets the treatment: UVs are p
 
 Every knob is a uniform, mirrored 1:1 from `LENS` in `config.js`.
 
+`LENS.mode` picks which effect that second pass runs:
+
+- **`glass`** — the refracting lens described above.
+- **`sphere`** — the row is sampled as if it were wrapped around a cylinder with its ends rolled toward the camera. Closer means magnified, so reading a tighter vertical slice of the framebuffer toward the edges makes the outer panels grow, with a little shading as the surface turns away.
+
+Both are held off the middle of the screen by the same edge mask (see below), so the centred card stays flat whichever is running.
+
+### Keeping the middle clean
+
+The effects only bite toward the left and right edges. A horizontal mask ramps from 0 across a clear band around the centre up to 1 at the screen edges, and the band is derived from the panel itself — half a card's width plus `LENS.edgeClear`, in height-fraction units — so the active card stays undistorted at any panel size or window size.
+
+The mask scales the whole effect, displacement and glow alike, rather than just its alpha. Cross-fading a bent image over an unbent one ghosts in the transition zone; ramping the bend itself reads as glass gradually taking hold.
+
 ## 4. Hover, when the world moves
 
 One non-obvious problem: the pointer isn't the only thing that moves — the row slides underneath it. Testing hover only on pointer events left the state stale whenever the carousel moved beneath a still cursor: a panel arriving under the pointer got no grab cursor until you jiggled the mouse. So `refreshHover()` re-runs the hit test every frame, right after `layout()` rebuilds the panel rectangles.
