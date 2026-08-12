@@ -2,7 +2,7 @@
   "name": "webgl-carousel",
   "version": "0.1.0",
   "private": true,
-  "description": "Infinite scroll-driven portfolio carousel with a liquid-glass lens shader — three.js + GSAP, thin React wrapper.",
+  "description": "Infinite drag-driven portfolio carousel with a liquid-glass lens shader — three.js, thin React wrapper.",
   "license": "MIT",
   "scripts": {
     "dev": "next dev",
