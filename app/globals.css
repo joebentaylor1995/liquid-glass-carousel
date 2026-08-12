@@ -1,12 +1,7 @@
 @import "tailwindcss";
 
-@font-face {
-  font-family: "carousel-font";
-  src: url("/font.woff");
-  font-weight: 400;
-  font-style: normal;
-}
-
+/* the face itself is loaded by next/font/local in layout.js, so the URL
+   follows the base path wherever the site is hosted */
 body {
-  font-family: "carousel-font";
+  font-family: var(--font-carousel), sans-serif;
 }

@@ -6,6 +6,7 @@
 // overlay (the engine parks that element over the hovered panel; the fade
 // and the contents are ours).
 import React, { useCallback, useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { gsap } from "gsap";
 import { PROJECTS, CONFIG, HOVER, UI_ANIM } from "@/lib/carousel/config";
@@ -243,9 +244,9 @@ const CarouselSection = () => {
         <ul>
           {PROJECTS.map((p) => (
             <li key={p.href}>
-              <a href={p.href}>
+              <Link href={p.href}>
                 {p.title} — {p.subtitle}
-              </a>
+              </Link>
             </li>
           ))}
         </ul>

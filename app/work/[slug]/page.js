@@ -2,6 +2,11 @@ import React from "react";
 import Link from "next/link";
 import { PROJECTS } from "@/lib/carousel/config";
 
+// every project's slug, so the static export knows what to prerender
+export function generateStaticParams() {
+  return PROJECTS.map((p) => ({ slug: p.href.split("/").pop() }));
+}
+
 // Stand-in destination for the carousel links, so clicking a panel actually
 // lands somewhere. Swap this for the real case-study page.
 export default async function WorkPage({ params }) {
