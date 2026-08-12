@@ -50,6 +50,9 @@ const CarouselSection = () => {
 
   const [active, setActive] = useState(0); // index of the centered image
   const [hovered, setHovered] = useState(-1); // index under the mouse (-1 none)
+  // the overlay's contents lag `hovered`: they stay put on the way out so the
+  // fade has something to fade, instead of unmounting the instant you leave
+  const [shown, setShown] = useState(0);
   // "pending" until we know the viewport (SSR-safe), then "ok" | "small"
   const [screen, setScreen] = useState("pending");
 
@@ -75,7 +78,10 @@ const CarouselSection = () => {
     const engine = createCarousel(mountRef.current, {
       overlayElement: overlayRef.current,
       onActiveChange: setActive,
-      onHoverChange: setHovered,
+      onHoverChange: (i) => {
+        setHovered(i);
+        if (i >= 0) setShown(i);
+      },
       onSelect: (i) => routerRef.current?.push(PROJECTS[i].href),
     });
     engineRef.current = engine;
@@ -112,20 +118,6 @@ const CarouselSection = () => {
     );
   }, [active]);
 
-  // ---- hover overlay fade ----
-  // The engine only moves the element; showing it is ours, so the fade can't
-  // fight the per-frame transform writes.
-  useEffect(() => {
-    const node = overlayRef.current;
-    if (!node) return;
-    gsap.to(node, {
-      autoAlpha: hovered >= 0 ? 1 : 0,
-      duration: HOVER.fade,
-      ease: HOVER.ease,
-      overwrite: true,
-    });
-  }, [hovered]);
-
   const step = useCallback((dir) => engineRef.current?.step(dir), []);
 
   // small screens: a plain black holding screen instead of the carousel.
@@ -146,13 +138,9 @@ const CarouselSection = () => {
   }
 
   const project = PROJECTS[active];
-  const hoveredProject = hovered >= 0 ? PROJECTS[hovered] : null;
-  const shownTags = hoveredProject
-    ? hoveredProject.tags.slice(0, HOVER.maxTags)
-    : [];
-  const restTags = hoveredProject
-    ? hoveredProject.tags.length - shownTags.length
-    : 0;
+  const hoveredProject = PROJECTS[shown];
+  const shownTags = hoveredProject.tags.slice(0, HOVER.maxTags);
+  const restTags = hoveredProject.tags.length - shownTags.length;
 
   return (
     <section
@@ -160,47 +148,58 @@ const CarouselSection = () => {
       aria-label="Featured work"
       className="relative h-[100dvh] w-full overflow-hidden bg-white"
     >
-      {/* hover overlay — the engine sets its transform/size every frame */}
+      {/* hover overlay — the engine sets its transform/size every frame, the
+          fade is ours (CSS, so the render loop can't stall it) */}
       <div
         ref={overlayRef}
         className="pointer-events-none absolute left-0 top-0 z-20 overflow-hidden"
-        style={{ opacity: 0, visibility: "hidden", willChange: "transform" }}
+        style={{
+          opacity: hovered >= 0 ? 1 : 0,
+          // visibility flips only once the fade is over, so it never cuts it short
+          visibility: hovered >= 0 ? "visible" : "hidden",
+          transition: `opacity ${HOVER.fade}s ${HOVER.ease}, visibility 0s linear ${
+            hovered >= 0 ? 0 : HOVER.fade
+          }s`,
+          willChange: "transform, opacity",
+          borderRadius: CONFIG.RADIUS,
+        }}
       >
-        {hoveredProject && (
-          <div
-            className="flex h-full w-full flex-col justify-between p-7"
-            style={{
-              backgroundColor: `rgba(0, 0, 0, ${HOVER.scrim})`,
-              backdropFilter: `blur(${HOVER.blur}px)`,
-              WebkitBackdropFilter: `blur(${HOVER.blur}px)`,
-            }}
-          >
-            <div className="flex flex-wrap">
-              {shownTags.map((tag) => (
-                <span
-                  key={tag}
-                  className="-ml-px border border-white/25 px-3 py-2 text-[10px] uppercase tracking-[0.16em] text-white first:ml-0"
-                >
-                  {tag}
-                </span>
-              ))}
-              {restTags > 0 && (
-                <span className="-ml-px border border-white/25 px-3 py-2 text-[10px] uppercase tracking-[0.16em] text-white/70">
-                  +{restTags} more
-                </span>
-              )}
-            </div>
-
-            <div>
-              <p className="text-[44px] font-light italic leading-none text-white">
-                {hoveredProject.stat.value}
-              </p>
-              <p className="mt-3 text-[10px] uppercase tracking-[0.16em] text-white/70">
-                {hoveredProject.stat.label}
-              </p>
-            </div>
+        <div
+          className="flex h-full w-full flex-col justify-between p-7"
+          style={{
+            backgroundColor: `rgba(0, 0, 0, ${HOVER.scrim})`,
+            borderRadius: CONFIG.RADIUS,
+          }}
+        >
+          <div className="flex flex-wrap gap-1.5">
+            {shownTags.map((tag) => (
+              <span
+                key={tag}
+                className="border border-white/25 px-3 py-2 text-[10px] uppercase tracking-[0.16em] text-white"
+                style={{ borderRadius: CONFIG.RADIUS }}
+              >
+                {tag}
+              </span>
+            ))}
+            {restTags > 0 && (
+              <span
+                className="border border-white/25 px-3 py-2 text-[10px] uppercase tracking-[0.16em] text-white/70"
+                style={{ borderRadius: CONFIG.RADIUS }}
+              >
+                +{restTags} more
+              </span>
+            )}
           </div>
-        )}
+
+          <div>
+            <p className="text-[44px] font-light italic leading-none text-white">
+              {hoveredProject.stat.value}
+            </p>
+            <p className="mt-3 text-[10px] uppercase tracking-[0.16em] text-white/70">
+              {hoveredProject.stat.label}
+            </p>
+          </div>
+        </div>
       </div>
 
       {/* caption for the centred panel */}
